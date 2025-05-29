@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "https://vault.dev.com"   # thay bằng domain thật
+      ADMIN_TOKEN: "123456789_supersecret_token_nduydu" # dùng để login quản trị (có thể bỏ nếu không cần)
+    ports:
+      - "8003:80"
+    volumes:
+      - ./data:/data

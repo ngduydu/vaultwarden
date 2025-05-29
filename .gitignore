@@ -1,0 +1,10 @@
+# Ignore Vaultwarden data folder
+data/
+
+# Ignore backup files
+*.tar.gz
+*.zip
+
+# Ignore Docker files if auto-generated
+*.log
+.env
