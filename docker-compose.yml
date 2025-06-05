@@ -8,6 +8,8 @@ services:
     environment:
       DOMAIN: "https://vault.dev.com"   # thay bằng domain thật
       ADMIN_TOKEN: "123456789_supersecret_token_nduydu" # dùng để login quản trị (có thể bỏ nếu không cần)
+      #SIGNUPS_ALLOWED: "false"         # Không cho đăng ký tự do
+      #INVITE_ONLY: "true"              # Chỉ ai có link invite mới đăng ký được
     ports:
       - "8003:80"
     volumes:
