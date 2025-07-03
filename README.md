@@ -97,5 +97,3 @@ Vaultwarden lưu trữ dữ liệu người dùng, file đính kèm, thiết l�
 - Đặt firewall nếu chỉ dùng nội bộ
 
 ---
-
-Cứ gửi tiếp nếu bạn cần viết tiếp phần setup HTTPS với Nginx hoặc backup định kỳ tự động.
