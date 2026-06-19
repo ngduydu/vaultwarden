@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DOMAIN: ${DOMAIN}   # thay bằng domain thật
+      ADMIN_TOKEN: ${ADMIN_TOKEN} # dùng để login quản trị (có thể bỏ nếu không cần)
+      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED}         # Không cho đăng ký tự do
+      INVITE_ONLY: ${INVITE_ONLY}              # Chỉ ai có link invite mới đăng ký được
+
+      # --- CẤU HÌNH GỬI EMAIL (SMTP) ---
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURITY: ${SMTP_SECURITY}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      # LƯU Ý: SMTP_PASSWORD là "Mật khẩu ứng dụng", KHÔNG PHẢI mật khẩu chính của Gmail
+      SMTP_PASSWORD: ${SMTP_PASSWORD} 
+      SMTP_AUTH_MECHANISM: "Plain"
+    ports:
+      - "${VAULTWARDEN_PORT:-8003}:80"
+    volumes:
+      - ./data:/data

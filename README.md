@@ -1,110 +1,156 @@
-# 🚀 Vaultwarden Self-Hosted (Bitwarden Alternative)
+﻿# Vaultwarden Self-Hosted
 
-**Vaultwarden** là phiên bản nhẹ, mã nguồn mở của Bitwarden, cho phép bạn tự triển khai hệ thống quản lý mật khẩu riêng tư, an toàn và dễ sử dụng.
+`Vaultwarden` là một phiên bản nhẹ của Bitwarden, phù hợp để tự host trình quản lý mật khẩu trên máy chủ riêng.
 
----
+Repo này đã được cấu hình theo hướng:
 
-## 🧰 Yêu cầu trước khi bắt đầu
+- `docker-compose.yml` được commit lên GitHub
+- `.env` chỉ dùng ở máy chạy thật, không commit
+- `.env.example` được commit để làm file mẫu cấu hình
 
-- ✅ Máy chủ chạy **Ubuntu**, Debian hoặc Linux tương đương
-- ✅ Đã cài **Docker** và **Docker Compose**
+## Yêu cầu
 
-> Nếu chưa cài Docker:
-> ```bash
-> curl -fsSL https://get.docker.com | bash
-> sudo apt install docker-compose -y
-> ```
+- Docker
+- Docker Compose plugin (`docker compose`)
 
 Kiểm tra:
 
 ```bash
 docker -v
-docker-compose -v
+docker compose version
 ```
 
----
+## Cấu trúc file
 
-## 📦 Bước 1: Tạo thư mục project
-
-### 👉 Di chuyển đến nơi bạn muốn lưu project (ví dụ `/var/www` hoặc `/home`):
-
-```bash
-cd /var/www
+```text
+docker-compose.yml
+.env.example
+.env
+data/
 ```
 
-> 📌 Bạn có thể chọn bất kỳ thư mục nào phù hợp với hệ thống của bạn.
+Ý nghĩa:
 
-### 👉 Tạo thư mục `vaultwarden` và di chuyển vào:
+- `docker-compose.yml`: cấu hình chạy container
+- `.env.example`: file mẫu để tham khảo và copy sang máy khác
+- `.env`: file chứa giá trị thật như domain, token, SMTP
+- `data/`: nơi lưu dữ liệu Vaultwarden
+
+## Cách sử dụng
+
+### 1. Clone repo
 
 ```bash
-mkdir -p vaultwarden
+git clone <REPO_URL>
 cd vaultwarden
 ```
 
----
+### 2. Tạo file `.env` từ file mẫu
 
-## 📄 Bước 2: Tạo file `docker-compose.yml`
-
-Tạo file:
+Linux:
 
 ```bash
-nano docker-compose.yml
+cp .env.example .env
 ```
 
-Dán nội dung sau:
+Windows PowerShell:
 
-```yaml
-version: '3'
-
-services:
-  vaultwarden:
-    image: vaultwarden/server:latest
-    container_name: vaultwarden
-    restart: unless-stopped
-    environment:
-      DOMAIN: "https://vault.example.com"   # ⚠️ Thay bằng domain thực tế
-      ADMIN_TOKEN: "123456789_supersecret_token"  # 🔐 Dùng để vào trang quản trị
-    ports:
-      - "8003:80"
-    volumes:
-      - ./data:/data
+```powershell
+Copy-Item .env.example .env
 ```
 
----
+### 3. Sửa file `.env`
 
-## ▶️ Bước 3: Khởi chạy Vaultwarden
+Cần cập nhật các giá trị trong `.env` cho đúng với môi trường thật:
+
+```env
+DOMAIN=https://vault.example.com
+ADMIN_TOKEN=change_this_to_a_long_random_string
+SIGNUPS_ALLOWED=false
+INVITE_ONLY=true
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURITY=starttls
+SMTP_FROM=your-email@gmail.com
+SMTP_FROM_NAME=Vaultwarden Security
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_AUTH_MECHANISM=Plain
+
+VAULTWARDEN_PORT=8003
+```
+
+Giải thích nhanh:
+
+- `DOMAIN`: domain dùng để truy cập Vaultwarden
+- `ADMIN_TOKEN`: token để vào trang admin
+- `SIGNUPS_ALLOWED=false`: không cho đăng ký tự do
+- `INVITE_ONLY=true`: chỉ đăng ký qua lời mời
+- `SMTP_*`: cấu hình gửi email
+- `VAULTWARDEN_PORT`: cổng mở ra bên ngoài máy chủ
+
+## Chạy dịch vụ
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
----
+Kiểm tra log:
 
-## ✅ Bước 4: Truy cập
-
-- IP: `http://<SERVER_IP>:8003`
-- Domain (nếu có): `https://vault.example.com`
-
-Trang admin:
-
-```
-http://<SERVER_IP>:8003/admin
+```bash
+docker compose logs -f
 ```
 
----
+Dừng dịch vụ:
 
-## 💾 Dữ liệu lưu ở đâu?
-
-```
-./data  →  <thư mục hiện tại>/data
+```bash
+docker compose down
 ```
 
----
+## Truy cập
 
-## 🔒 Gợi ý bảo mật
+- Vaultwarden: `http://<SERVER_IP>:8003`
+- Nếu dùng domain và reverse proxy: `https://vault.example.com`
+- Trang admin: `http://<SERVER_IP>:8003/admin`
 
-- Dùng HTTPS (Nginx + Let's Encrypt)
-- Không lộ `ADMIN_TOKEN`
-- Giới hạn truy cập bằng firewall nếu cần
+Nếu bạn đổi `VAULTWARDEN_PORT` trong `.env` thì thay `8003` bằng cổng mới.
 
----
+## Dữ liệu lưu ở đâu
+
+Dữ liệu được lưu trong thư mục:
+
+```text
+./data
+```
+
+Thư mục này cần được backup định kỳ.
+
+## Làm việc với GitHub
+
+Nên commit:
+
+- `docker-compose.yml`
+- `.env.example`
+- `README.md`
+
+Không nên commit:
+
+- `.env`
+- `data/`
+
+Quy trình cho máy khác:
+
+1. Pull hoặc clone repo về.
+2. Copy `.env.example` thành `.env`.
+3. Điền giá trị thật vào `.env`.
+4. Chạy `docker compose up -d`.
+
+## Gợi ý bảo mật
+
+- Dùng `ADMIN_TOKEN` dài, khó đoán
+- Không commit `.env` lên GitHub
+- Nên dùng HTTPS thông qua Nginx, Traefik hoặc Cloudflare Tunnel
+- Backup thư mục `data/` định kỳ
+- Nếu dùng Gmail SMTP, hãy dùng app password thay vì mật khẩu tài khoản
+

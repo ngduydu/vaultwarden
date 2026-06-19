@@ -8,4 +8,4 @@ data/
 # Ignore Docker files if auto-generated
 *.log
 .env
-docker-compose.yml
+.agents/
